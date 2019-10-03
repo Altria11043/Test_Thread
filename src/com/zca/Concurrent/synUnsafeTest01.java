@@ -1,24 +1,23 @@
 package com.zca.Concurrent;
 
 /**
- * 并发导致的线程不安全问题一
- * 同时抢票
+ * 线程安全:在并发时保证数据的正确性,效率尽可能高
  * @author Altria
  * Date: 2/10/2019 下午 12:37
  */
-public class UnsafeTest01 {
+public class synUnsafeTest01 {
     public static void main(String[] args) {
-        UnsafeWeb12306 uw = new UnsafeWeb12306();
+        synUnsafeWeb12306 uw = new synUnsafeWeb12306();
 
-        new Thread(uw, "上班族").start();
         new Thread(uw, "学生党").start();
+        new Thread(uw, "上班族").start();
         new Thread(uw, "黄牛").start();
     }
 }
 
-class UnsafeWeb12306 implements Runnable{
+class synUnsafeWeb12306 implements Runnable{
 
-    private int ticktNums = 20;
+    private int ticktNums = 1000;
     boolean flag = true;
 
     @Override
@@ -28,10 +27,11 @@ class UnsafeWeb12306 implements Runnable{
         }
     }
 
-    // 将方法分离
-    private void testWeb12306(){
-        if (ticktNums < 0){
+    // 对这个方法加锁
+    public synchronized void testWeb12306(){
+        if (ticktNums <= 0){
             flag = false;
+            return;
         }
         try {
             Thread.sleep(100);
